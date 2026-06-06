@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI 图片生成</title>
+    <title>SenseNova AI 创作平台</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -19,16 +20,50 @@
         }
         
         .container {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
         }
         
-        h1 {
-            color: white;
+        .header {
             text-align: center;
+            color: white;
             margin-bottom: 30px;
-            font-size: 2.5rem;
+        }
+        
+        .header h1 {
+            font-size: 2.8rem;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+        
+        .tab-btn {
+            padding: 12px 30px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn:hover, .tab-btn.active {
+            background: white;
+            color: #667eea;
+            border-color: white;
         }
         
         .card {
@@ -50,7 +85,7 @@
             color: #333;
         }
         
-        textarea {
+        textarea, input[type="text"], select {
             width: 100%;
             padding: 15px;
             border: 2px solid #e0e0e0;
@@ -61,7 +96,7 @@
             transition: border-color 0.3s;
         }
         
-        textarea:focus {
+        textarea:focus, input[type="text"]:focus, select:focus {
             outline: none;
             border-color: #667eea;
         }
@@ -90,6 +125,18 @@
             transform: none;
         }
         
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .btn-success {
+            background: #28a745;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+        }
+        
         .result-section {
             display: none;
         }
@@ -98,12 +145,12 @@
             display: block;
         }
         
-        .image-container {
+        .result-container {
             text-align: center;
             margin-top: 20px;
         }
         
-        .image-container img {
+        .result-container img, .result-container video {
             max-width: 100%;
             border-radius: 12px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
@@ -152,6 +199,19 @@
             display: block;
         }
         
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .success.active {
+            display: block;
+        }
+        
         .download-btn {
             display: inline-block;
             margin-top: 20px;
@@ -181,86 +241,556 @@
             border-radius: 4px;
             font-family: monospace;
         }
+        
+        .api-key-section {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .api-key-section input {
+            margin-top: 10px;
+            min-height: 50px;
+        }
+        
+        .api-key-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .api-key-actions button {
+            flex: 1;
+            padding: 10px;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .option-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .option-card.active {
+            border-color: #667eea;
+            background: #eef2ff;
+        }
+        
+        .option-card h4 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .option-card select, .option-card input {
+            min-height: 40px;
+            margin-top: 5px;
+        }
+        
+        .history-section {
+            margin-top: 30px;
+        }
+        
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .history-item {
+            background: white;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .history-item:hover {
+            transform: scale(1.05);
+        }
+        
+        .history-item img, .history-item video {
+            width: 100%;
+            border-radius: 4px;
+        }
+        
+        .history-item p {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #666;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .delete-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🎨 AI 图片生成</h1>
-        
-        <div class="card">
-            <div class="api-config">
-                <strong>API 端点:</strong> <code>https://token.sensenova.cn/v1</code>
-            </div>
-            
-            <div class="form-group">
-                <label for="prompt">描述你想生成的图片：</label>
-                <textarea id="prompt" placeholder="例如：一只可爱的猫咪在花园里玩耍，阳光明媚，色彩鲜艳..."></textarea>
-            </div>
-            
-            <button class="btn" id="generateBtn" onclick="generateImage()">
-                ✨ 生成图片
-            </button>
+        <div class="header">
+            <h1>🎨 SenseNova AI 创作平台</h1>
+            <p>基于商汤科技大模型，轻松生成精美图片与视频</p>
         </div>
         
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <p class="loading-text">正在生成图片，请稍候...</p>
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="image">🖼️ 图片生成</button>
+            <button class="tab-btn" data-tab="video">🎬 视频生成</button>
+            <button class="tab-btn" data-tab="settings">⚙️ 设置</button>
         </div>
         
-        <div class="error" id="error"></div>
-        
-        <div class="card result-section" id="result">
-            <h2 style="margin-bottom: 20px; color: #333;">🖼️ 生成结果</h2>
-            <div class="image-container">
-                <img id="generatedImage" src="" alt="生成的图片">
+        <!-- 图片生成 -->
+        <div id="image-tab" class="tab-content active">
+            <div class="card">
+                <div class="api-key-section">
+                    <strong><i class="fas fa-key"></i> API 密钥配置</strong>
+                    <p style="font-size: 14px; color: #666; margin-top: 5px;">您的密钥将保存在本地浏览器中，不会上传到任何服务器</p>
+                    <input type="password" id="apiKey" placeholder="请输入您的 SenseNova API 密钥">
+                    <div class="api-key-actions">
+                        <button class="btn-success" onclick="saveApiKey()"><i class="fas fa-save"></i> 保存密钥</button>
+                        <button class="btn-secondary" onclick="clearApiKey()"><i class="fas fa-trash"></i> 清除密钥</button>
+                        <button class="btn-secondary" onclick="showApiKey()"><i class="fas fa-eye"></i> 查看</button>
+                    </div>
+                    <div id="apiKeyStatus" class="success" style="margin-top: 10px;"></div>
+                </div>
+                
+                <div class="api-config">
+                    <strong>API 端点:</strong> <code>https://token.sensenova.cn/v1</code>
+                </div>
+                
+                <div class="form-group">
+                    <label for="imagePrompt"><i class="fas fa-pen"></i> 描述你想生成的图片：</label>
+                    <textarea id="imagePrompt" placeholder="例如：一只可爱的猫咪在花园里玩耍，阳光明媚，色彩鲜艳，写实风格，高清细节..."></textarea>
+                </div>
+                
+                <div class="options-grid">
+                    <div class="option-card active">
+                        <h4>📐 图片尺寸</h4>
+                        <select id="imageSize">
+                            <option value="1024x1024">1024 × 1024 (正方形)</option>
+                            <option value="1280x720">1280 × 720 (横屏)</option>
+                            <option value="720x1280">720 × 1280 (竖屏)</option>
+                            <option value="2048x2048">2048 × 2048 (高清)</option>
+                        </select>
+                    </div>
+                    <div class="option-card">
+                        <h4>🎨 生成数量</h4>
+                        <select id="imageCount">
+                            <option value="1">1 张</option>
+                            <option value="2">2 张</option>
+                            <option value="4">4 张</option>
+                        </select>
+                    </div>
+                    <div class="option-card">
+                        <h4>🖌️ 艺术风格</h4>
+                        <select id="imageStyle">
+                            <option value="realistic">写实风格</option>
+                            <option value="anime">动漫风格</option>
+                            <option value="painting">油画风格</option>
+                            <option value="sketch">素描风格</option>
+                            <option value="3d">3D 渲染</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button class="btn" id="generateImageBtn" onclick="generateImage()" style="margin-top: 20px;">
+                    <i class="fas fa-magic"></i> 生成图片
+                </button>
             </div>
-            <div style="text-align: center;">
-                <a id="downloadBtn" class="download-btn" download>📥 下载图片</a>
+            
+            <div class="loading" id="imageLoading">
+                <div class="spinner"></div>
+                <p class="loading-text">正在生成图片，请稍候...</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="imageProgress"></div>
+                </div>
+            </div>
+            
+            <div class="error" id="imageError"></div>
+            <div class="success" id="imageSuccess"></div>
+            
+            <div class="card result-section" id="imageResult">
+                <h2 style="margin-bottom: 20px; color: #333;"><i class="fas fa-images"></i> 生成结果</h2>
+                <div class="result-container" id="imageResultContainer"></div>
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn btn-secondary" onclick="addToHistory('image')"><i class="fas fa-history"></i> 保存到历史</button>
+                </div>
+            </div>
+            
+            <div class="card history-section">
+                <h3 style="margin-bottom: 15px;"><i class="fas fa-history"></i> 生成历史</h3>
+                <button class="btn btn-danger" onclick="clearHistory()" style="width: auto; padding: 8px 20px; font-size: 14px;"><i class="fas fa-trash"></i> 清空历史</button>
+                <div class="history-grid" id="imageHistory"></div>
+            </div>
+        </div>
+        
+        <!-- 视频生成 -->
+        <div id="video-tab" class="tab-content hidden">
+            <div class="card">
+                <div class="api-key-section">
+                    <strong><i class="fas fa-key"></i> API 密钥配置</strong>
+                    <p style="font-size: 14px; color: #666; margin-top: 5px;">您的密钥将保存在本地浏览器中，不会上传到任何服务器</p>
+                    <input type="password" id="videoApiKey" placeholder="请输入您的 SenseNova API 密钥">
+                    <div class="api-key-actions">
+                        <button class="btn-success" onclick="saveVideoApiKey()"><i class="fas fa-save"></i> 保存密钥</button>
+                        <button class="btn-secondary" onclick="clearVideoApiKey()"><i class="fas fa-trash"></i> 清除密钥</button>
+                        <button class="btn-secondary" onclick="showVideoApiKey()"><i class="fas fa-eye"></i> 查看</button>
+                    </div>
+                    <div id="videoApiKeyStatus" class="success" style="margin-top: 10px;"></div>
+                </div>
+                
+                <div class="api-config">
+                    <strong>API 端点:</strong> <code>https://token.sensenova.cn/v1</code>
+                </div>
+                
+                <div class="form-group">
+                    <label for="videoPrompt"><i class="fas fa-video"></i> 描述你想生成的视频：</label>
+                    <textarea id="videoPrompt" placeholder="例如：一个美丽的日落场景，海浪轻轻拍打着沙滩，天空呈现橙色和紫色的渐变，电影质感，4K 画质..." style="min-height: 150px;"></textarea>
+                </div>
+                
+                <div class="options-grid">
+                    <div class="option-card active">
+                        <h4>⏱️ 视频时长</h4>
+                        <select id="videoDuration">
+                            <option value="5">5 秒</option>
+                            <option value="10">10 秒</option>
+                            <option value="15">15 秒</option>
+                        </select>
+                    </div>
+                    <div class="option-card">
+                        <h4>📐 视频尺寸</h4>
+                        <select id="videoSize">
+                            <option value="1280x720">1280 × 720 (HD)</option>
+                            <option value="1920x1080">1920 × 1080 (Full HD)</option>
+                            <option value="720x1280">720 × 1280 (竖屏)</option>
+                        </select>
+                    </div>
+                    <div class="option-card">
+                        <h4>🎬 视频风格</h4>
+                        <select id="videoStyle">
+                            <option value="cinematic">电影质感</option>
+                            <option value="realistic">写实风格</option>
+                            <option value="anime">动漫风格</option>
+                            <option value="3d">3D 动画</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button class="btn" id="generateVideoBtn" onclick="generateVideo()" style="margin-top: 20px;">
+                    <i class="fas fa-film"></i> 生成视频
+                </button>
+            </div>
+            
+            <div class="loading" id="videoLoading">
+                <div class="spinner"></div>
+                <p class="loading-text">正在生成视频，这可能需要几分钟...</p>
+                <p class="loading-text" style="font-size: 14px; color: #999;">视频生成需要更长时间，请耐心等待</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="videoProgress"></div>
+                </div>
+            </div>
+            
+            <div class="error" id="videoError"></div>
+            <div class="success" id="videoSuccess"></div>
+            
+            <div class="card result-section" id="videoResult">
+                <h2 style="margin-bottom: 20px; color: #333;"><i class="fas fa-video"></i> 生成结果</h2>
+                <div class="result-container" id="videoResultContainer"></div>
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn btn-secondary" onclick="addToHistory('video')"><i class="fas fa-history"></i> 保存到历史</button>
+                </div>
+            </div>
+            
+            <div class="card history-section">
+                <h3 style="margin-bottom: 15px;"><i class="fas fa-history"></i> 生成历史</h3>
+                <button class="btn btn-danger" onclick="clearVideoHistory()" style="width: auto; padding: 8px 20px; font-size: 14px;"><i class="fas fa-trash"></i> 清空历史</button>
+                <div class="history-grid" id="videoHistory"></div>
+            </div>
+        </div>
+        
+        <!-- 设置 -->
+        <div id="settings-tab" class="tab-content hidden">
+            <div class="card">
+                <h2 style="margin-bottom: 20px;"><i class="fas fa-cog"></i> 平台设置</h2>
+                
+                <div class="form-group">
+                    <label>🌐 API 基础地址</label>
+                    <input type="text" id="apiBaseUrl" value="https://token.sensenova.cn/v1" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label>🔑 图片生成 API 密钥</label>
+                    <input type="password" id="settingsImageApiKey" readonly>
+                    <button class="btn btn-secondary" onclick="editImageApiKey()" style="margin-top: 10px;">
+                        <i class="fas fa-edit"></i> 编辑密钥
+                    </button>
+                </div>
+                
+                <div class="form-group">
+                    <label>🔑 视频生成 API 密钥</label>
+                    <input type="password" id="settingsVideoApiKey" readonly>
+                    <button class="btn btn-secondary" onclick="editVideoApiKey()" style="margin-top: 10px;">
+                        <i class="fas fa-edit"></i> 编辑密钥
+                    </button>
+                </div>
+                
+                <div class="form-group">
+                    <label>📊 使用统计</label>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                        <p>图片生成次数: <strong id="imageCountStat">0</strong></p>
+                        <p>视频生成次数: <strong id="videoCountStat">0</strong></p>
+                        <p>总生成次数: <strong id="totalCountStat">0</strong></p>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>🗑️ 数据管理</label>
+                    <button class="btn btn-danger" onclick="clearAllData()">
+                        <i class="fas fa-trash-alt"></i> 清除所有数据
+                    </button>
+                </div>
+                
+                <div class="api-config">
+                    <h4 style="margin-bottom: 10px;">📖 使用说明</h4>
+                    <ol style="margin-left: 20px; line-height: 1.8;">
+                        <li>在 "设置" 页面配置您的 SenseNova API 密钥</li>
+                        <li>在 "图片生成" 或 "视频生成" 页面输入描述</li>
+                        <li>选择合适的参数（尺寸、风格、时长等）</li>
+                        <li>点击生成按钮等待结果</li>
+                        <li>生成完成后可以下载或保存到历史记录</li>
+                    </ol>
+                </div>
+                
+                <div class="api-config">
+                    <h4 style="margin-bottom: 10px;">🔗 相关链接</h4>
+                    <p>官方文档: <a href="https://token.sensenova.cn" target="_blank">https://token.sensenova.cn</a></p>
+                    <p>API 文档: <a href="https://token.sensenova.cn/docs" target="_blank">https://token.sensenova.cn/docs</a></p>
+                </div>
             </div>
         </div>
     </div>
     
     <script>
-        const API_ENDPOINT = 'https://token.sensenova.cn/v1';
+        // 全局变量
+        const API_BASE_URL = 'https://token.sensenova.cn/v1';
+        let currentTab = 'image';
         
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadApiKey();
+            loadVideoApiKey();
+            loadHistory();
+            updateStats();
+            setupTabListeners();
+        });
+        
+        // 标签页切换
+        function setupTabListeners() {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tab = this.dataset.tab;
+                    switchTab(tab);
+                });
+            });
+        }
+        
+        function switchTab(tab) {
+            // 更新按钮状态
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.tab === tab) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // 更新内容显示
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            document.getElementById(`${tab}-tab`).classList.remove('hidden');
+            
+            currentTab = tab;
+        }
+        
+        // API 密钥管理
+        function saveApiKey() {
+            const key = document.getElementById('apiKey').value.trim();
+            if (!key) {
+                showStatus('apiKeyStatus', '请输入 API 密钥', 'error');
+                return;
+            }
+            localStorage.setItem('sensenova_api_key', key);
+            showStatus('apiKeyStatus', '✅ API 密钥已保存', 'success');
+            loadApiKey();
+        }
+        
+        function loadApiKey() {
+            const key = localStorage.getItem('sensenova_api_key') || '';
+            document.getElementById('apiKey').value = key;
+            document.getElementById('settingsImageApiKey').value = key ? '••••••••••••' : '';
+        }
+        
+        function clearApiKey() {
+            localStorage.removeItem('sensenova_api_key');
+            document.getElementById('apiKey').value = '';
+            document.getElementById('settingsImageApiKey').value = '';
+            showStatus('apiKeyStatus', '✅ API 密钥已清除', 'success');
+        }
+        
+        function showApiKey() {
+            const input = document.getElementById('apiKey');
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+        
+        function editImageApiKey() {
+            switchTab('settings');
+            document.getElementById('apiKey').focus();
+        }
+        
+        // 视频 API 密钥管理
+        function saveVideoApiKey() {
+            const key = document.getElementById('videoApiKey').value.trim();
+            if (!key) {
+                showStatus('videoApiKeyStatus', '请输入 API 密钥', 'error');
+                return;
+            }
+            localStorage.setItem('sensenova_video_api_key', key);
+            showStatus('videoApiKeyStatus', '✅ API 密钥已保存', 'success');
+            loadVideoApiKey();
+        }
+        
+        function loadVideoApiKey() {
+            const key = localStorage.getItem('sensenova_video_api_key') || '';
+            document.getElementById('videoApiKey').value = key;
+            document.getElementById('settingsVideoApiKey').value = key ? '••••••••••••' : '';
+        }
+        
+        function clearVideoApiKey() {
+            localStorage.removeItem('sensenova_video_api_key');
+            document.getElementById('videoApiKey').value = '';
+            document.getElementById('settingsVideoApiKey').value = '';
+            showStatus('videoApiKeyStatus', '✅ API 密钥已清除', 'success');
+        }
+        
+        function showVideoApiKey() {
+            const input = document.getElementById('videoApiKey');
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+        
+        function editVideoApiKey() {
+            switchTab('settings');
+            document.getElementById('videoApiKey').focus();
+        }
+        
+        function showStatus(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = type === 'success' ? 'success active' : 'error active';
+            setTimeout(() => {
+                element.classList.remove('active');
+            }, 3000);
+        }
+        
+        // 图片生成
         async function generateImage() {
-            const prompt = document.getElementById('prompt').value.trim();
-            const generateBtn = document.getElementById('generateBtn');
-            const loading = document.getElementById('loading');
-            const error = document.getElementById('error');
-            const result = document.getElementById('result');
-            const generatedImage = document.getElementById('generatedImage');
-            const downloadBtn = document.getElementById('downloadBtn');
+            const prompt = document.getElementById('imagePrompt').value.trim();
+            const apiKey = localStorage.getItem('sensenova_api_key');
+            const btn = document.getElementById('generateImageBtn');
+            const loading = document.getElementById('imageLoading');
+            const error = document.getElementById('imageError');
+            const success = document.getElementById('imageSuccess');
+            const result = document.getElementById('imageResult');
+            const container = document.getElementById('imageResultContainer');
+            const progress = document.getElementById('imageProgress');
             
             // 重置状态
             error.classList.remove('active');
+            success.classList.remove('active');
             result.classList.remove('active');
             
             // 验证输入
             if (!prompt) {
-                showError('请输入图片描述！');
+                showError('imageError', '请输入图片描述！');
+                return;
+            }
+            
+            if (!apiKey) {
+                showError('imageError', '请先配置 API 密钥！请在设置页面添加密钥。');
                 return;
             }
             
             // 设置加载状态
-            generateBtn.disabled = true;
-            generateBtn.textContent = '⏳ 生成中...';
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 生成中...';
             loading.classList.add('active');
             
             try {
+                // 模拟进度
+                for (let i = 0; i <= 100; i += 10) {
+                    progress.style.width = i + '%';
+                    await sleep(200);
+                }
+                
                 // 调用 AI 图片生成 API
-                const response = await fetch(`${API_ENDPOINT}/images/generations`, {
+                const response = await fetch(`${API_BASE_URL}/images/generations`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        // 如果有API密钥，请取消下面这行的注释并填入你的密钥
-                        // 'Authorization': 'Bearer YOUR_API_KEY',
+                        'Authorization': `Bearer ${apiKey}`,
                     },
                     body: JSON.stringify({
                         model: 'stable-diffusion',
                         prompt: prompt,
-                        n: 1,
-                        size: '1024x1024'
+                        n: parseInt(document.getElementById('imageCount').value),
+                        size: document.getElementById('imageSize').value,
+                        style: document.getElementById('imageStyle').value
                     })
                 });
                 
@@ -271,34 +801,280 @@
                 
                 const data = await response.json();
                 
-                if (data.data && data.data[0] && data.data[0].url) {
-                    const imageUrl = data.data[0].url;
-                    generatedImage.src = imageUrl;
-                    downloadBtn.href = imageUrl;
+                if (data.data && data.data.length > 0) {
+                    let html = '';
+                    data.data.forEach((item, index) => {
+                        const imageUrl = item.url || item.b64_json ? (item.url || `data:image/png;base64,${item.b64_json}`) : '';
+                        if (imageUrl) {
+                            html += `
+                                <div style="display: inline-block; margin: 10px;">
+                                    <img src="${imageUrl}" alt="生成的图片 ${index + 1}" style="max-width: 100%; border-radius: 8px;">
+                                    <br>
+                                    <a href="${imageUrl}" download="sensenova_image_${Date.now()}_${index}.png" class="download-btn">
+                                        <i class="fas fa-download"></i> 下载
+                                    </a>
+                                </div>
+                            `;
+                        }
+                    });
+                    container.innerHTML = html;
                     result.classList.add('active');
+                    
+                    // 更新统计
+                    incrementStat('image');
+                    
+                    showStatus('imageSuccess', '✅ 图片生成成功！', 'success');
                 } else {
                     throw new Error('API 返回的数据格式不正确');
                 }
                 
             } catch (err) {
-                showError(`生成失败：${err.message}`);
+                showError('imageError', `生成失败：${err.message}`);
             } finally {
-                generateBtn.disabled = false;
-                generateBtn.textContent = '✨ 生成图片';
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-magic"></i> 生成图片';
                 loading.classList.remove('active');
+                progress.style.width = '0%';
             }
         }
         
-        function showError(message) {
-            const error = document.getElementById('error');
-            error.textContent = '❌ ' + message;
-            error.classList.add('active');
+        // 视频生成
+        async function generateVideo() {
+            const prompt = document.getElementById('videoPrompt').value.trim();
+            const apiKey = localStorage.getItem('sensenova_video_api_key') || localStorage.getItem('sensenova_api_key');
+            const btn = document.getElementById('generateVideoBtn');
+            const loading = document.getElementById('videoLoading');
+            const error = document.getElementById('videoError');
+            const success = document.getElementById('videoSuccess');
+            const result = document.getElementById('videoResult');
+            const container = document.getElementById('videoResultContainer');
+            const progress = document.getElementById('videoProgress');
+            
+            // 重置状态
+            error.classList.remove('active');
+            success.classList.remove('active');
+            result.classList.remove('active');
+            
+            // 验证输入
+            if (!prompt) {
+                showError('videoError', '请输入视频描述！');
+                return;
+            }
+            
+            if (!apiKey) {
+                showError('videoError', '请先配置 API 密钥！请在设置页面添加密钥。');
+                return;
+            }
+            
+            // 设置加载状态
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 生成中...';
+            loading.classList.add('active');
+            
+            try {
+                // 模拟进度（视频生成更慢）
+                for (let i = 0; i <= 100; i += 5) {
+                    progress.style.width = i + '%';
+                    await sleep(500);
+                }
+                
+                // 调用 AI 视频生成 API
+                const response = await fetch(`${API_BASE_URL}/videos/generations`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`,
+                    },
+                    body: JSON.stringify({
+                        model: 'video-generation',
+                        prompt: prompt,
+                        duration: parseInt(document.getElementById('videoDuration').value),
+                        size: document.getElementById('videoSize').value,
+                        style: document.getElementById('videoStyle').value
+                    })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error?.message || `HTTP 错误！状态码: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.data && data.data[0] && (data.data[0].url || data.data[0].b64_json)) {
+                    const videoUrl = data.data[0].url || `data:video/mp4;base64,${data.data[0].b64_json}`;
+                    container.innerHTML = `
+                        <video controls width="100%" style="max-width: 800px;">
+                            <source src="${videoUrl}" type="video/mp4">
+                            您的浏览器不支持视频播放
+                        </video>
+                        <br>
+                        <a href="${videoUrl}" download="sensenova_video_${Date.now()}.mp4" class="download-btn">
+                            <i class="fas fa-download"></i> 下载视频
+                        </a>
+                    `;
+                    result.classList.add('active');
+                    
+                    // 更新统计
+                    incrementStat('video');
+                    
+                    showStatus('videoSuccess', '✅ 视频生成成功！', 'success');
+                } else {
+                    throw new Error('API 返回的数据格式不正确');
+                }
+                
+            } catch (err) {
+                showError('videoError', `生成失败：${err.message}`);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-film"></i> 生成视频';
+                loading.classList.remove('active');
+                progress.style.width = '0%';
+            }
         }
         
-        // 支持按 Ctrl+Enter 提交
-        document.getElementById('prompt').addEventListener('keydown', function(e) {
+        // 历史记录管理
+        function addToHistory(type) {
+            const container = document.getElementById(`${type}ResultContainer`);
+            const items = container.querySelectorAll('img, video');
+            
+            if (items.length === 0) {
+                showError(`${type}Error`, '没有可保存的内容');
+                return;
+            }
+            
+            const history = JSON.parse(localStorage.getItem(`sensenova_${type}_history`) || '[]');
+            
+            items.forEach(item => {
+                const src = item.src;
+                const prompt = type === 'image' ? document.getElementById('imagePrompt').value : document.getElementById('videoPrompt').value;
+                
+                history.unshift({
+                    src: src,
+                    prompt: prompt,
+                    timestamp: Date.now(),
+                    type: type
+                });
+            });
+            
+            // 限制历史记录数量
+            while (history.length > 50) {
+                history.pop();
+            }
+            
+            localStorage.setItem(`sensenova_${type}_history`, JSON.stringify(history));
+            loadHistory();
+            showStatus(`${type}Success`, '✅ 已保存到历史记录', 'success');
+        }
+        
+        function loadHistory() {
+            // 加载图片历史
+            const imageHistory = JSON.parse(localStorage.getItem('sensenova_image_history') || '[]');
+            renderHistory('imageHistory', imageHistory, 'image');
+            
+            // 加载视频历史
+            const videoHistory = JSON.parse(localStorage.getItem('sensenova_video_history') || '[]');
+            renderHistory('videoHistory', videoHistory, 'video');
+        }
+        
+        function renderHistory(elementId, history, type) {
+            const container = document.getElementById(elementId);
+            
+            if (history.length === 0) {
+                container.innerHTML = '<p style="color: #999; grid-column: 1/-1; text-align: center;">暂无历史记录</p>';
+                return;
+            }
+            
+            container.innerHTML = history.map((item, index) => `
+                <div class="history-item" style="position: relative;">
+                    <button class="delete-btn" onclick="deleteHistoryItem('${type}', ${index})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    ${item.type === 'image' ? 
+                        `<img src="${item.src}" alt="历史图片" onclick="restoreFromHistory('${type}', '${item.src}')">` :
+                        `<video src="${item.src}" controls onclick="restoreFromHistory('${type}', '${item.src}')" style="width: 100%; border-radius: 4px;"></video>`
+                    }
+                    <p title="${item.prompt}">${item.prompt.substring(0, 50)}${item.prompt.length > 50 ? '...' : ''}</p>
+                </div>
+            `).join('');
+        }
+        
+        function deleteHistoryItem(type, index) {
+            const history = JSON.parse(localStorage.getItem(`sensenova_${type}_history`) || '[]');
+            history.splice(index, 1);
+            localStorage.setItem(`sensenova_${type}_history`, JSON.stringify(history));
+            loadHistory();
+        }
+        
+        function clearHistory() {
+            if (confirm('确定要清空图片历史记录吗？')) {
+                localStorage.removeItem('sensenova_image_history');
+                loadHistory();
+            }
+        }
+        
+        function clearVideoHistory() {
+            if (confirm('确定要清空视频历史记录吗？')) {
+                localStorage.removeItem('sensenova_video_history');
+                loadHistory();
+            }
+        }
+        
+        function restoreFromHistory(type, src) {
+            const container = document.getElementById(`${type}ResultContainer`);
+            container.innerHTML = type === 'image' ? 
+                `<img src="${src}" alt="恢复的图片" style="max-width: 100%; border-radius: 8px;">` :
+                `<video controls width="100%" style="max-width: 800px;"><source src="${src}" type="video/mp4">您的浏览器不支持视频播放</video>`;
+            
+            document.getElementById(`${type}Result`).classList.add('active');
+            switchTab(type);
+        }
+        
+        // 统计管理
+        function incrementStat(type) {
+            const stats = JSON.parse(localStorage.getItem('sensenova_stats') || '{"image": 0, "video": 0}');
+            stats[type] = (stats[type] || 0) + 1;
+            localStorage.setItem('sensenova_stats', JSON.stringify(stats));
+            updateStats();
+        }
+        
+        function updateStats() {
+            const stats = JSON.parse(localStorage.getItem('sensenova_stats') || '{"image": 0, "video": 0}');
+            document.getElementById('imageCountStat').textContent = stats.image || 0;
+            document.getElementById('videoCountStat').textContent = stats.video || 0;
+            document.getElementById('totalCountStat').textContent = (stats.image || 0) + (stats.video || 0);
+        }
+        
+        // 清除所有数据
+        function clearAllData() {
+            if (confirm('⚠️ 确定要清除所有数据吗？这将删除所有 API 密钥、历史记录和统计信息！')) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+        
+        // 工具函数
+        function showError(elementId, message) {
+            const element = document.getElementById(elementId);
+            element.textContent = '❌ ' + message;
+            element.classList.add('active');
+            setTimeout(() => {
+                element.classList.remove('active');
+            }, 5000);
+        }
+        
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        
+        // 支持快捷键
+        document.addEventListener('keydown', function(e) {
             if (e.ctrlKey && e.key === 'Enter') {
-                generateImage();
+                if (currentTab === 'image') {
+                    generateImage();
+                } else if (currentTab === 'video') {
+                    generateVideo();
+                }
             }
         });
     </script>
